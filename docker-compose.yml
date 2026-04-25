@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  vectoraidb:
+    image: williamimoh/actian-vectorai-db:latest
+    container_name: memorymesh-vectoraidb
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./data/vectoraidb:/data
+    restart: unless-stopped
+    stop_grace_period: 2m
+

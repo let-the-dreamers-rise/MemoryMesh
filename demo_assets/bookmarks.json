@@ -1,0 +1,13 @@
+[
+  {
+    "title": "Local-first AI product notes",
+    "url": "https://example.local/local-first-ai",
+    "description": "Private retrieval, edge vector search, offline memory, user-owned embeddings."
+  },
+  {
+    "title": "Hybrid retrieval reminder",
+    "url": "https://example.local/hybrid-rag",
+    "description": "Use semantic search plus keyword intent, then merge with reciprocal rank fusion."
+  }
+]
+

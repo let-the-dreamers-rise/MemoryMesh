@@ -1,0 +1,15 @@
+.venv/
+.deps/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.whl
+.env
+data/
+node_modules/
+dist/
+tsconfig.tsbuildinfo
+.DS_Store
+.pytest_cache/
+.mypy_cache/
