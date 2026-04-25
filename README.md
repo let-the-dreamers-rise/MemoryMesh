@@ -2,25 +2,114 @@
 
 Trace where an idea came from across everything you saved.
 
-MemoryMesh is a local-first decision-trail engine built for the Actian VectorAI DB Build Challenge. Instead of generic “chat with your notes,” it reconstructs where an idea came from by searching across notes, PDFs, bookmarks, and screenshots, then surfacing the source chain behind the final answer.
+MemoryMesh is a local-first decision-trail engine built for the Actian VectorAI DB Build Challenge. Instead of generic "chat with your notes," it reconstructs the source chain behind an idea by searching across notes, PDFs, bookmarks, and screenshots, then surfacing the exact evidence and related memories that led to the final answer.
 
-## Why It Wins
+## Why Judges Should Care
 
-- VectorAI DB is central: every memory chunk is embedded, stored, filtered, and retrieved from Actian VectorAI DB.
-- Advanced usage is visible: named vectors (`semantic` + `intent`), filtered search, client-side RRF hybrid fusion, HNSW collection tuning, VDE stats, and local persistence.
-- Demo is instant: seed sample memories, ask where an idea came from, reveal exact source evidence and a multi-source decision trail.
-- Bonus-friendly: retrieval runs locally with Dockerized VectorAI DB and a local embedding model.
+- This is not generic personal RAG. The core interaction is provenance reconstruction: "Where did this idea come from?"
+- Actian VectorAI DB is the retrieval engine, not a bolt-on. The product only works because vector search, metadata filters, and hybrid fusion are central to the flow.
+- The demo is immediate and understandable. Seed the archive, ask one question, and the app shows exact evidence plus the cross-source decision trail.
+- The project is aligned with Actian's local-first positioning. Retrieval runs on-device with Dockerized VectorAI DB and local embeddings.
 
-## Features
+## The Problem
 
-- Upload `.txt`, `.md`, `.pdf`, `.json`, `.png`, `.jpg`, and `.jpeg` files.
-- Local MiniLM embeddings through `sentence-transformers/all-MiniLM-L6-v2`.
-- Automatic fallback hashing embeddings for quick UI demos when ML dependencies are not installed.
-- Filter by source type: notes, PDFs, bookmarks, screenshots.
-- Named vectors in Actian VectorAI DB: `semantic` for meaning and `intent` for retrieval intent.
-- Hybrid retrieval: semantic and intent searches fused with Reciprocal Rank Fusion.
-- Decision trails: reconstruct the chain of notes, bookmarks, PDFs, and screenshots behind an idea.
-- Judge-facing diagnostics: backend status, VectorAI collection, result counts, fusion mode, filter mode.
+People save ideas across too many places: notes, bookmarked links, PDF snippets, screenshots, and random text files. Later, they may remember the final idea but not the chain of evidence behind it.
+
+Traditional search fails because:
+
+- keyword search misses semantically related material
+- generic note search returns isolated matches without context
+- most RAG demos answer a question, but do not reconstruct how the answer formed
+
+## The Solution
+
+MemoryMesh lets users ask questions like:
+
+`Where did my USDC agent commerce idea come from?`
+
+Instead of returning one matching chunk, the app returns:
+
+- the strongest source memory
+- supporting notes, bookmarks, PDFs, or screenshots
+- a decision trail that shows how the idea connects across time and source type
+- retrieval diagnostics that make the Actian usage visible in the demo
+
+## Why Actian VectorAI DB Is Core
+
+MemoryMesh is designed around advanced VectorAI usage:
+
+- Named vectors: each memory stores both `semantic` and `intent` representations in the same collection.
+- Filtered search: users can narrow retrieval by source type, tags, and metadata.
+- Hybrid fusion: semantic and intent retrieval paths are fused with Reciprocal Rank Fusion.
+- HNSW tuning: the collection is configured for fast approximate nearest-neighbor retrieval.
+- Local persistence and diagnostics: retrieval happens locally, with collection status exposed in the UI.
+
+Without the vector database, the central behavior of the product does not exist.
+
+## What Makes This Different
+
+Most hackathon knowledge apps stop at "upload docs and ask questions."
+
+MemoryMesh is differentiated by:
+
+- focusing on decision provenance instead of generic retrieval
+- connecting mixed personal knowledge sources in one search flow
+- making cross-source memory connections part of the answer
+- turning advanced vector retrieval into a visible demo moment
+
+## Judge-Facing Demo Flow
+
+1. Click `Seed demo brain`.
+2. Ask: `Where did my USDC agent commerce idea come from?`
+3. Show the strongest evidence on the right.
+4. Show the thought graph and connected memories below.
+5. Point out the diagnostics pills and source filters.
+6. Ask: `When did I feel stuck but later figured it out?`
+7. Explain that this proves the system can recover similar situations, not just exact note matches.
+
+## Judging Criteria Mapping
+
+### Use of Actian VectorAI DB
+
+- VectorAI DB stores the core memory index.
+- Named vectors, metadata filters, and hybrid fusion are essential to the answer quality.
+- The app is not a UI wrapped around static notes; retrieval is the product.
+
+### Real-World Impact
+
+- Founders can trace where a product idea came from.
+- Researchers can recover supporting evidence behind a conclusion.
+- Operators can reconnect past notes, links, and screenshots into a usable knowledge trail.
+
+### Technical Execution
+
+- FastAPI backend with ingestion, chunking, embedding, retrieval, and diagnostics
+- React frontend with filters, evidence panels, and a thought-connection graph
+- Local OCR and document extraction path for screenshots and PDFs
+- Named-vector retrieval plus Reciprocal Rank Fusion over multiple search paths
+
+### Demo and Presentation
+
+- The problem is understandable in one sentence.
+- The first query produces an immediate "aha" moment.
+- The result view visibly proves the vector database is doing real work.
+
+## Architecture
+
+1. Ingest notes, PDFs, bookmarks, screenshots, or raw text.
+2. Extract and chunk content into searchable memories.
+3. Create embeddings locally.
+4. Store vectors plus metadata in Actian VectorAI DB.
+5. Run named-vector retrieval with optional filters.
+6. Fuse results and return exact evidence plus connected memories.
+
+## Stack
+
+- Backend: FastAPI, Python
+- Frontend: React, TypeScript, Vite
+- Vector database: Actian VectorAI DB beta
+- Embeddings: `sentence-transformers/all-MiniLM-L6-v2`
+- OCR and parsing: `pytesseract`, `pypdf`, local extraction utilities
 
 ## Quick Start
 
@@ -30,7 +119,7 @@ MemoryMesh is a local-first decision-trail engine built for the Actian VectorAI 
 docker compose up -d
 ```
 
-If Docker is not installed, the app still runs in demo fallback mode, but the hackathon submission should be recorded with Actian running.
+If Docker is unavailable, the app can still run in fallback mode for a UI demo, but the strongest submission should be recorded with Actian running.
 
 2. Start the backend.
 
@@ -38,9 +127,11 @@ If Docker is not installed, the app still runs in demo fallback mode, but the ha
 .\start-backend.ps1
 ```
 
-For a quick UI smoke test without the MiniLM download, run `.\start-backend.ps1 -Lite`.
+For a quick smoke test without the MiniLM download:
 
-If the local Python installation cannot create a working virtual environment, the script automatically falls back to a workspace-local `.deps` directory so the backend can still start.
+```powershell
+.\start-backend.ps1 -Lite
+```
 
 3. Start the frontend.
 
@@ -48,24 +139,12 @@ If the local Python installation cannot create a working virtual environment, th
 .\start-frontend.ps1
 ```
 
-Open `http://localhost:5173`.
+4. Open:
 
-## Demo Script
+`http://localhost:5173`
 
-1. Click `Seed demo brain`.
-2. Search: `Where did my USDC agent commerce idea come from?`
-3. Point out the exact source evidence and the decision trail reconstruction.
-4. Click source filters such as `bookmark` or `note`.
-5. Search: `When did I feel stuck but later figured it out?`
-6. Show the cross-source trail to demonstrate why vector retrieval is the product, not a bolt-on.
+## Repository Notes
 
-## Judging Criteria Mapping
-
-- Use of Actian VectorAI DB: named-vector collection creation, HNSW tuning, payload filters, point upsert/search, hybrid fusion, VDE stats.
-- Real-world impact: founders, researchers, and operators can recover not just notes but the provenance of a decision.
-- Technical execution: FastAPI backend, typed React frontend, local extraction/chunking/embedding pipeline, named-vector retrieval.
-- Demo and presentation: polished UI with visible diagnostics and a memorable “where did this idea come from?” moment.
-
-## Notes
-
-Do not commit the beta `.whl` file. The `.gitignore` excludes wheels, and setup installs it from the organizer-provided beta repo path.
+- Do not commit the Actian beta `.whl` file.
+- The project is configured to install the beta wheel from the organizer-provided local repo path.
+- The repo includes a seeded demo flow so the judge-facing experience is reliable and fast.
